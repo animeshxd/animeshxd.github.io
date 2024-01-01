@@ -1,0 +1,9 @@
+obs-rtspserver
+paru-bin
+php56-cli
+php56-mysql
+php70
+php70-cli
+php70-mysql
+rtl8821au-dkms-git
+visual-studio-code-bin

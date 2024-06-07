@@ -145,7 +145,7 @@ HOSTNAME=arch
 
 pacman-key --init
 pacman-key --populate archlinux
-pacstrap -K $MOUNT base linux linux-firmware linux-headers vim 
+pacstrap -K $MOUNT base linux linux-firmware linux-headers vim sudo
 genfstab -U $MOUNT >> $MOUNT/etc/fstab
 
 cp pkglist $MOUNT/root/pkglist

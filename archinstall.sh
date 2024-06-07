@@ -177,7 +177,7 @@ ln -sf /usr/share/zoneinfo/Asia/Kolkata /etc/localtime
 hwclock --systohc
 locale-gen
 pacman -Syu --noconfirm
-pacman -S --noconfirm --needed - < pkglist
+pacman -S --noconfirm --needed - < /root/pkglist
 
 useradd -m -G wheel user
 echo "user:user" | chpasswd

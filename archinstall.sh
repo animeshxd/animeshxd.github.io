@@ -40,7 +40,6 @@ kcalc
 kde-gtk-config
 kdeplasma-addons
 krfb
-ksysguard
 kwallet-pam
 kwalletmanager
 lib32-libva-mesa-driver
@@ -75,6 +74,7 @@ pipewire-pulse
 plasma-desktop
 plasma-nm
 plasma-pa
+plasma-systemmonitor
 plasma-wayland-protocols
 python-pip
 python-pipx

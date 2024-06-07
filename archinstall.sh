@@ -76,7 +76,6 @@ plasma-desktop
 plasma-nm
 plasma-pa
 plasma-wayland-protocols
-plasma-wayland-session
 python-pip
 python-pipx
 qemu-base

@@ -82,7 +82,6 @@ qemu-base
 reflector
 rsync
 spectacle
-sshfs
 sudo
 telegram-desktop
 tree
@@ -102,10 +101,12 @@ xdg-desktop-portal-kde
 xf86-video-amdgpu
 yarn
 zip
-ebtables
 dnsmasq
 bridge-utils
 libguestfs
+pipewire-jack
+qt6-multimedia-ffmpeg
+noto-fonts
 EOF
 
 cat > pkglist.aur <<EOF
@@ -144,7 +145,7 @@ HOSTNAME=arch
 
 pacman-key --init
 pacman-key --populate archlinux
-pacstrap -K $MOUNT base linux linux-firmware linux-headers vim sudo
+pacstrap -K $MOUNT base linux linux-firmware linux-headers vim sudo amd-ucode
 genfstab -U $MOUNT >> $MOUNT/etc/fstab
 
 cp pkglist $MOUNT/root/pkglist
@@ -170,13 +171,17 @@ sed -i 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' $MOUNT/etc/sudoe
 sed -i 's/#Color/Color/' $MOUNT/etc/pacman.conf
 sed -z 's/#\[multilib\]\n#Include/\[multilib\]\nInclude/g' -i $MOUNT/etc/pacman.conf
 
+cat $MOUNT/etc/NetworkManager/conf.d/wifi_backend.conf <<EOF
+[device]
+wifi.backend=iwd
+EOF
 
-arch-chroot $MOUNT /bin/bash -- <<EOF
+arch-chroot $MOUNT /bin/bash - <<EOF
 ln -sf /usr/share/zoneinfo/Asia/Kolkata /etc/localtime
 hwclock --systohc
 locale-gen
 pacman -Syu --noconfirm
-pacman -S --noconfirm --needed - < /root/pkglist
+pacman -S --needed - < /root/pkglist
 
 useradd -m -G wheel user
 echo "user:user" | chpasswd
@@ -184,6 +189,3 @@ echo "root:root" | chpasswd
 
 systemctl enable NetworkManager
 EOF
-
-
-

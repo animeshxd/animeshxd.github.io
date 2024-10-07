@@ -17,7 +17,6 @@ cdrtools
 clang
 cmake
 cups
-discover
 dnsmasq
 docker
 docker-compose
@@ -28,20 +27,12 @@ flatpak
 gimp
 git
 gperf
-handbrake
 hplip
 htop
 iptables-nft
 iwd
 jdk-openjdk
 jdk8-openjdk
-kate
-kcalc
-kde-gtk-config
-kdeplasma-addons
-krfb
-kwallet-pam
-kwalletmanager
 lib32-libva-mesa-driver
 lib32-mesa
 lib32-mesa-vdpau
@@ -71,17 +62,11 @@ p7zip
 php
 pipewire
 pipewire-pulse
-plasma-desktop
-plasma-nm
-plasma-pa
-plasma-systemmonitor
-plasma-wayland-protocols
 python-pip
 python-pipx
 qemu-base
 reflector
 rsync
-spectacle
 sudo
 telegram-desktop
 tree
@@ -97,7 +82,6 @@ vulkan-radeon
 wayland-protocols
 wayvnc
 wget
-xdg-desktop-portal-kde
 xf86-video-amdgpu
 yarn
 zip
@@ -107,6 +91,21 @@ libguestfs
 pipewire-jack
 qt6-multimedia-ffmpeg
 noto-fonts
+plasma-desktop
+plasma-nm
+plasma-pa
+plasma-systemmonitor
+plasma-wayland-protocols
+kde-gtk-config
+kdeplasma-addons
+kate
+kcalc
+krfb
+kwallet-pam
+kwalletmanager
+discover
+spectacle
+xdg-desktop-portal-kde
 EOF
 
 cat > pkglist.aur <<EOF

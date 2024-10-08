@@ -116,6 +116,14 @@ EOF
 
 ping -c 3 archlinux.org
 
+cat > arch.conf <<EOF
+title   Arch Linux
+linux   /vmlinuz-linux-lts
+initrd  /initramfs-linux-lts.img
+initrd 	/amd-ucode.img
+options root=/dev/nvme0n1p6 rw
+EOF
+
 cat > /etc/pacman.d/mirrorlist <<EOF
 ##
 

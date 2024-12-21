@@ -117,7 +117,7 @@ EOF
 ping -c 3 archlinux.org
 
 cat > arch.conf <<EOF
-title   Arch Linux
+title   Arch Linux LTS
 linux   /vmlinuz-linux-lts
 initrd  /initramfs-linux-lts.img
 initrd 	/amd-ucode.img

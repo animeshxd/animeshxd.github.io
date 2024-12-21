@@ -1,118 +1,139 @@
 set -e
 
-cat > pkglist <<EOF
-alacritty
-amd-ucode
-ark
-base
-base-devel
-bash-completion
-bluedevil
-bluez
-bluez-utils
-breeze-gtk
-bridge-utils
-catimg
-cdrtools
-clang
-cmake
-cups
-dnsmasq
-docker
-docker-compose
-dolphin
-dotnet-sdk
-firefox
-flatpak
-gimp
-git
-gperf
-hplip
-htop
-iptables-nft
-iwd
-jdk-openjdk
-jdk8-openjdk
-lib32-libva-mesa-driver
-lib32-mesa
-lib32-mesa-vdpau
-lib32-vulkan-radeon
-libreoffice-fresh
-libva-mesa-driver
-libvirt
-libxcrypt-compat
-linux
-linux-firmware
-linux-headers
-lsb-release
-man-db
-mesa-vdpau
-neovim
-networkmanager
-ninja
-nodejs
-noto-fonts-cjk
-noto-fonts-emoji
-npm
-obs-studio
-openbsd-netcat
-openjdk-src
-openssh
-p7zip
-php
-pipewire
-pipewire-pulse
-python-pip
-python-pipx
-qemu-base
-reflector
-rsync
-sudo
-telegram-desktop
-tree
-unrar
-unzip
-usbutils
-v4l2loopback-dkms
-vde2
-vim
-virt-manager
-virt-viewer
-vulkan-radeon
-wayland-protocols
-wayvnc
-wget
-xf86-video-amdgpu
-yarn
-zip
-dnsmasq
-bridge-utils
-libguestfs
-pipewire-jack
-qt6-multimedia-ffmpeg
-noto-fonts
-plasma-desktop
-plasma-nm
-plasma-pa
-plasma-systemmonitor
-plasma-wayland-protocols
-kde-gtk-config
-kdeplasma-addons
-kate
-kcalc
-krfb
-kwallet-pam
-kwalletmanager
-discover
-spectacle
-xdg-desktop-portal-kde
-EOF
 
-cat > pkglist.aur <<EOF
-paru-bin
-rtl8821au-dkms-git
-visual-studio-code-bin
-EOF
+BASE_PACKAGES=(
+  base
+  linux
+  linux-headers
+  linux-firmware
+  linux-lts-headers
+  linux-lts
+  amd-ucode
+  sudo
+  vim
+  bash-completion
+  networkmanager
+  iwd
+)
+
+
+OTHER_PACKAGES=(
+  mesa
+  vulkan-radeon
+  mesa-vdpau
+  lib32-mesa
+  lib32-mesa-vdpau
+  lib32-vulkan-radeon
+  libva-mesa-driver
+  lib32-libva-mesa-driver
+  xf86-video-amdgpu
+
+  firefox
+  alacritty
+
+  git
+  htop
+  neovim
+  openssh
+  reflector
+  rsync
+  openbsd-netcat
+  p7zip
+  tree
+  unrar
+  zip
+  unzip
+  usbutils
+  wget
+  lsb-release
+  man-db
+
+  pipewire
+  pipewire-pulse
+  pipewire-jack
+
+  base-devel
+  bluedevil
+  cmake
+  clang
+  ninja
+
+  dotnet-sdk
+  openjdk-src
+  jdk-openjdk
+  jdk8-openjdk
+  nodejs
+  npm
+  yarn
+  php
+  python-pip
+  python-pipx
+
+  bluez
+  bluez-utils
+
+  gimp
+  flatpak
+  obs-studio
+  v4l2loopback-dkms
+  telegram-desktop
+  libreoffice-fresh
+  
+  catimg
+  cdrtools
+  
+  hplip
+  cups
+  
+  iptables-nft
+  bridge-utils
+  dnsmasq
+  vde2
+  libguestfs
+  libvirt
+  virt-manager
+  virt-viewer
+  qemu-base
+
+  docker
+  docker-compose
+
+  gperf
+  libxcrypt-compat
+  
+  noto-fonts
+  noto-fonts-cjk
+  noto-fonts-emoji
+
+  wayland-protocols
+  wayvnc
+  qt6-multimedia-ffmpeg
+  plasma-desktop
+  plasma-nm
+  plasma-pa
+  plasma-systemmonitor
+  plasma-wayland-protocols
+  kde-gtk-config
+  kdeplasma-addons
+  breeze-gtk
+  ark
+  dolphin
+  kate
+  kcalc
+  krfb
+  kwallet-pam
+  kwalletmanager
+  discover
+  spectacle
+  xdg-desktop-portal-kde
+)
+
+AUR_PACKAGES=(
+  paru-bin
+  rtl8821au-dkms-git
+  visual-studio-code-bin
+)
+
 
 ping -c 3 archlinux.org
 
@@ -152,11 +173,11 @@ HOSTNAME=arch
 
 pacman-key --init
 pacman-key --populate archlinux
-pacstrap -K $MOUNT base linux linux-firmware linux-headers vim sudo amd-ucode
+pacstrap -K $MOUNT ${BASE_PACKAGES[@]}
 genfstab -U $MOUNT >> $MOUNT/etc/fstab
 
-cp pkglist $MOUNT/root/pkglist
-cp pkglist.aur $MOUNT/root/pkglist.aur
+printf "%s\n" "${OTHER_PACKAGES[@]}" > $MOUNT/root/pkglist
+printf "%s\n" "${AUR_PACKAGES[@]}" > $MOUNT/root/pkglist.aur
 
 cp /etc/pacman.d/mirrorlist $MOUNT/etc/pacman.d/mirrorlist
 
@@ -187,6 +208,7 @@ EOF
 arch-chroot $MOUNT /bin/bash - <<EOF
 ln -sf /usr/share/zoneinfo/Asia/Kolkata /etc/localtime
 hwclock --systohc
+timedatectl set-local-rtc 1
 locale-gen
 pacman -Syu --noconfirm
 pacman -S --needed - < /root/pkglist

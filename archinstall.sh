@@ -53,7 +53,6 @@ OTHER_PACKAGES=(
   pipewire-jack
 
   base-devel
-  bluedevil
   cmake
   clang
   ninja
@@ -71,6 +70,7 @@ OTHER_PACKAGES=(
 
   bluez
   bluez-utils
+  bluedevil
 
   gimp
   flatpak

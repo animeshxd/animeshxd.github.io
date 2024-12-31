@@ -19,14 +19,10 @@ BASE_PACKAGES=(
 
 OTHER_PACKAGES=(
   mesa
-  vulkan-radeon
-  mesa-vdpau
   lib32-mesa
-  lib32-mesa-vdpau
-  lib32-vulkan-radeon
-  libva-mesa-driver
-  lib32-libva-mesa-driver
   xf86-video-amdgpu
+  vulkan-radeon
+  lib32-vulkan-radeon
 
   firefox
   alacritty

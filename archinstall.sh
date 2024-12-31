@@ -34,7 +34,7 @@ OTHER_PACKAGES=(
   reflector
   rsync
   openbsd-netcat
-  p7zip
+  7zip
   tree
   unrar
   zip

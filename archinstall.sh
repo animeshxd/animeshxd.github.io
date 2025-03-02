@@ -53,14 +53,14 @@ OTHER_PACKAGES=(
   clang
   ninja
 
-  dotnet-sdk
-  openjdk-src
-  jdk-openjdk
-  jdk8-openjdk
+  # dotnet-sdk
+  # openjdk-src
+  # jdk-openjdk
+  # jdk8-openjdk
   nodejs
   npm
   yarn
-  php
+  # php
   python-pip
   python-pipx
 
@@ -68,15 +68,15 @@ OTHER_PACKAGES=(
   bluez-utils
   bluedevil
 
-  gimp
-  flatpak
-  obs-studio
-  v4l2loopback-dkms
-  telegram-desktop
-  libreoffice-fresh
+  # gimp
+  # flatpak
+  # obs-studio
+  # v4l2loopback-dkms
+  # telegram-desktop
+  # libreoffice-fresh
   
-  catimg
-  cdrtools
+  # catimg
+  # cdrtools
   
   hplip
   cups
@@ -101,27 +101,42 @@ OTHER_PACKAGES=(
   noto-fonts-cjk
   noto-fonts-emoji
 
-  wayland-protocols
-  wayvnc
-  qt6-multimedia-ffmpeg
-  plasma-desktop
-  plasma-nm
-  plasma-pa
-  plasma-systemmonitor
-  plasma-wayland-protocols
-  kde-gtk-config
-  kdeplasma-addons
-  breeze-gtk
-  ark
-  dolphin
-  kate
-  kcalc
-  krfb
-  kwallet-pam
-  kwalletmanager
-  discover
-  spectacle
-  xdg-desktop-portal-kde
+  # wayland-protocols
+  # wayvnc
+  # qt6-multimedia-ffmpeg
+  # plasma-desktop
+  # plasma-nm
+  # plasma-pa
+  # plasma-systemmonitor
+  # plasma-wayland-protocols
+  # kde-gtk-config
+  # kdeplasma-addons
+  # breeze-gtk
+  # ark
+  # dolphin
+  # kate
+  # kcalc
+  # krfb
+  # kwallet-pam
+  # kwalletmanager
+  # discover
+  # spectacle
+  # xdg-desktop-portal-kde
+
+    hyprland
+    hyprpaper
+    waybar
+    dunst
+    wofi
+    wl-clipboard
+    grim
+    slurp
+    playerctl
+    pavucontrol
+    xdg-desktop-portal-hyprland
+    xdg-desktop-portal-gtk
+    gnome-keyring
+    polkit-gnome
 )
 
 AUR_PACKAGES=(

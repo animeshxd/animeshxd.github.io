@@ -122,7 +122,9 @@ OTHER_PACKAGES=(
   # discover
   # spectacle
   # xdg-desktop-portal-kde
-
+  
+    thunar
+    
     hyprland
     hyprpaper
     waybar

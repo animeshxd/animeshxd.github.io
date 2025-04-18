@@ -151,9 +151,9 @@ AUR_PACKAGES=(
 ping -c 3 archlinux.org
 
 cat > arch.conf <<EOF
-title   Arch Linux LTS
-linux   /vmlinuz-linux-lts
-initrd  /initramfs-linux-lts.img
+title   Arch Linux
+linux   /vmlinuz-linux
+initrd  /initramfs-linux.img
 initrd 	/amd-ucode.img
 options root=/dev/nvme0n1p6 rw
 EOF

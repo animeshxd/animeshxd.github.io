@@ -6,8 +6,8 @@ BASE_PACKAGES=(
   linux
   linux-headers
   linux-firmware
-  #linux-lts-headers
-  #linux-lts
+  # linux-lts-headers
+  # linux-lts
   amd-ucode
   sudo
   vim
@@ -123,22 +123,22 @@ OTHER_PACKAGES=(
   # spectacle
   # xdg-desktop-portal-kde
   
-    thunar
-    
-    hyprland
-    hyprpaper
-    waybar
-    dunst
-    wofi
-    wl-clipboard
-    grim
-    slurp
-    playerctl
-    pavucontrol
-    xdg-desktop-portal-hyprland
-    xdg-desktop-portal-gtk
-    gnome-keyring
-    polkit-gnome
+  thunar
+  
+  hyprland
+  hyprpaper
+  waybar
+  dunst
+  wofi
+  wl-clipboard
+  grim
+  slurp
+  playerctl
+  pavucontrol
+  xdg-desktop-portal-hyprland
+  xdg-desktop-portal-gtk
+  gnome-keyring
+  polkit-gnome
 )
 
 AUR_PACKAGES=(
@@ -158,28 +158,7 @@ initrd 	/amd-ucode.img
 options root=/dev/nvme0n1p6 rw
 EOF
 
-cat > /etc/pacman.d/mirrorlist <<EOF
-##
-
-## India
-#Server = http://mirror.4v1.in/archlinux/\$repo/os/\$arch
-#Server = https://mirror.4v1.in/archlinux/\$repo/os/\$arch
-#Server = https://mirrors.abhy.me/archlinux/\$repo/os/\$arch
-#Server = http://mirror.albony.in/archlinux/\$repo/os/\$arch
-#Server = http://in.mirrors.cicku.me/archlinux/\$repo/os/\$arch
-#Server = https://in.mirrors.cicku.me/archlinux/\$repo/os/\$arch
-#Server = http://mirror.cse.iitk.ac.in/archlinux/\$repo/os/\$arch
-#Server = http://in-mirror.garudalinux.org/archlinux/\$repo/os/\$arch
-#Server = https://in-mirror.garudalinux.org/archlinux/\$repo/os/\$arch
-#Server = http://archlinux.mirror.net.in/archlinux/\$repo/os/\$arch
-#Server = https://archlinux.mirror.net.in/archlinux/\$repo/os/\$arch
-#Server = http://mirrors.nxtgen.com/archlinux-mirror/\$repo/os/\$arch
-#Server = https://mirrors.nxtgen.com/archlinux-mirror/\$repo/os/\$arch
-#Server = http://mirrors.piconets.webwerks.in/archlinux-mirror/\$repo/os/\$arch
-#Server = https://mirrors.piconets.webwerks.in/archlinux-mirror/\$repo/os/\$arch
-Server = http://mirror.sahil.world/archlinux/\$repo/os/\$arch
-Server = https://mirror.sahil.world/archlinux/\$repo/os/\$arch
-EOF
+reflector -c India --threads 50 --sort age --sort rate --sort score --sort delay --download-timeout 3 --connection-timeout 3 --save /etc/pacman.d/mirrorlist
 
 MOUNT=/mnt
 HOSTNAME=arch

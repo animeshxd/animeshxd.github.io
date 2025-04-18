@@ -6,8 +6,8 @@ BASE_PACKAGES=(
   linux
   linux-headers
   linux-firmware
-  linux-lts-headers
-  linux-lts
+  #linux-lts-headers
+  #linux-lts
   amd-ucode
   sudo
   vim

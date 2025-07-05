@@ -5,7 +5,8 @@ BASE_PACKAGES=(
   base
   linux
   linux-headers
-  linux-firmware
+  linux-firmware-amdgpu
+  linux-firmware-realtek
   # linux-lts-headers
   # linux-lts
   amd-ucode

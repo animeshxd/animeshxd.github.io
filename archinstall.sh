@@ -12,7 +12,7 @@ BASE_PACKAGES=(
   sudo
   vim
   bash-completion
-  networkmanager
+  # networkmanager
   iwd
 )
 
@@ -191,16 +191,47 @@ sed -i 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' $MOUNT/etc/sudoe
 sed -i 's/#Color/Color/' $MOUNT/etc/pacman.conf
 sed -z 's/#\[multilib\]\n#Include/\[multilib\]\nInclude/g' -i $MOUNT/etc/pacman.conf
 
-mkdir -p $MOUNT/etc/NetworkManager/conf.d/
-cat > $MOUNT/etc/NetworkManager/conf.d/wifi_backend.conf <<EOF
-[device]
-wifi.backend=iwd
+# mkdir -p $MOUNT/etc/NetworkManager/conf.d/
+# cat > $MOUNT/etc/NetworkManager/conf.d/wifi_backend.conf <<EOF
+# [device]
+# wifi.backend=iwd
+# EOF
+
+mkdir -p /etc/systemd/network/
+cat > $MOUNT/etc/systemd/network/10-wired.network <<EOF
+[Match]
+Name=enp37s0
+
+[Link]
+RequiredForOnline=routable
+
+[Network]
+DHCP=yes
+EOF
+
+cat > $MOUNT/etc/systemd/network/20-wifi.network <<EOF
+[Match]
+Name=wlan0
+
+[Link]
+RequiredForOnline=routable
+
+[Network]
+Policy=down
+DHCP=yes
+IgnoreCarrierLoss=3s
+EOF
+
+cat > $MOUNT/etc/adjtime <<EOF
+0.0 0 0.0
+0
+LOCAL
 EOF
 
 arch-chroot $MOUNT /bin/bash - <<EOF
 ln -sf /usr/share/zoneinfo/Asia/Kolkata /etc/localtime
-hwclock --systohc
-timedatectl set-local-rtc 1
+hwclock --hctosys --localtime
+# timedatectl set-local-rtc 1
 locale-gen
 pacman -Syu --noconfirm
 pacman -S --needed - < /root/pkglist
@@ -209,5 +240,5 @@ useradd -m -G wheel user
 echo "user:user" | chpasswd
 echo "root:root" | chpasswd
 
-systemctl enable NetworkManager
+# systemctl enable NetworkManager
 EOF

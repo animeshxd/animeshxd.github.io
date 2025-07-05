@@ -53,6 +53,7 @@ OTHER_PACKAGES=(
   cmake
   clang
   ninja
+  gdb
 
   # dotnet-sdk
   # openjdk-src
@@ -60,7 +61,7 @@ OTHER_PACKAGES=(
   # jdk8-openjdk
   nodejs
   npm
-  yarn
+  # yarn
   # php
   python-pip
   python-pipx
@@ -95,8 +96,8 @@ OTHER_PACKAGES=(
   docker
   docker-compose
 
-  gperf
-  libxcrypt-compat
+  # gperf
+  # libxcrypt-compat
   
   noto-fonts
   noto-fonts-cjk
@@ -125,9 +126,11 @@ OTHER_PACKAGES=(
   # xdg-desktop-portal-kde
   
   thunar
-  
+  tumbler
+
   hyprland
-  hyprpaper
+  swww
+  # hyprpaper
   waybar
   dunst
   wofi
@@ -140,11 +143,15 @@ OTHER_PACKAGES=(
   xdg-desktop-portal-gtk
   gnome-keyring
   polkit-gnome
+  
+  dart-sass
+  #cava
+  #btop
 )
 
 AUR_PACKAGES=(
   paru-bin
-  rtl8821au-dkms-git
+  # rtl8821au-dkms-git
   visual-studio-code-bin
 )
 

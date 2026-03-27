@@ -83,11 +83,11 @@ OTHER_PACKAGES=(
   hplip
   cups
   
-  iptables-nft
-  bridge-utils
-  dnsmasq
-  vde2
-  libguestfs
+  # iptables-nft
+  # bridge
+  # dnsmasq
+  # vde2
+  # libguestfs
   libvirt
   virt-manager
   virt-viewer

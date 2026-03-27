@@ -1,110 +1,46 @@
+#!/usr/bin/env bash
 set -e
 
+readonly MOUNT_DIR="/mnt"
+readonly TARGET_HOSTNAME="arch"
+readonly TARGET_TIMEZONE="Asia/Kolkata"
 
-BASE_PACKAGES=(
+# PARTTYPE
+readonly GUID_EFI="c12a7328-f81f-11d2-ba4b-00a0c93ec93b" # EFI System
+readonly GUID_XBOOTLDR="bc13c2ff-59e6-4262-a352-b275fd6f7172" # Linux extended boot
+readonly GUID_ROOT="4f68bce3-e8cd-4db1-96e7-fbcaf984b709" # Linux root (x86-64)
+
+
+readonly BASE_PACKAGES=(
   base
   linux
   linux-headers
   linux-firmware-amdgpu
   linux-firmware-realtek
-  # linux-lts-headers
-  # linux-lts
   amd-ucode
   sudo
   vim
   bash-completion
-  # networkmanager
   iwd
 )
 
-
-OTHER_PACKAGES=(
-  mesa
-  lib32-mesa
-  xf86-video-amdgpu
-  vulkan-radeon
-  lib32-vulkan-radeon
-
-  firefox
-  alacritty
-
-  git
-  htop
-  neovim
-  openssh
-  reflector
-  rsync
-  openbsd-netcat
-  7zip
-  tree
-  unrar
-  zip
-  unzip
-  usbutils
-  wget
-  lsb-release
-  man-db
-
-  pipewire
-  pipewire-pulse
-  pipewire-jack
-
-  base-devel
-  cmake
-  clang
-  ninja
-  gdb
-
-  # dotnet-sdk
-  # openjdk-src
-  # jdk-openjdk
-  # jdk8-openjdk
-  nodejs
-  npm
-  # yarn
-  # php
-  python-pip
-  python-pipx
-
-  bluez
-  bluez-utils
-  bluedevil
-
-  # gimp
-  # flatpak
-  # obs-studio
-  # v4l2loopback-dkms
-  # telegram-desktop
-  # libreoffice-fresh
+readonly OTHER_PACKAGES=(
+  mesa xf86-video-amdgpu vulkan-radeon
+  firefox alacritty git htop neovim openssh reflector rsync openbsd-netcat
+  7zip tree unrar zip unzip usbutils wget lsb-release man-db
+  pipewire pipewire-pulse pipewire-jack
+  base-devel cmake clang ninja gdb nodejs npm python-pip python-pipx 
+  bluez bluez-utils bluedevil
+  hplip cups
+  libvirt virt-manager virt-viewer qemu-base docker docker-compose docker-buildx
+  noto-fonts noto-fonts-cjk noto-fonts-emoji
   
-  # catimg
-  # cdrtools
-  
-  hplip
-  cups
-  
-  # iptables-nft
-  # bridge
-  # dnsmasq
-  # vde2
-  # libguestfs
-  libvirt
-  virt-manager
-  virt-viewer
-  qemu-base
-
-  docker
-  docker-compose
-
-  # gperf
-  # libxcrypt-compat
-  
-  noto-fonts
-  noto-fonts-cjk
-  noto-fonts-emoji
+  thunar tumbler hyprland swww
+  waybar dunst wofi wl-clipboard grim slurp playerctl pavucontrol
+  xdg-desktop-portal-hyprland xdg-desktop-portal-gtk gnome-keyring
+  polkit-gnome dart-sass
 
   # wayland-protocols
-  # wayvnc
   # qt6-multimedia-ffmpeg
   # plasma-desktop
   # plasma-nm
@@ -116,99 +52,130 @@ OTHER_PACKAGES=(
   # breeze-gtk
   # ark
   # dolphin
-  # kate
-  # kcalc
-  # krfb
   # kwallet-pam
   # kwalletmanager
   # discover
   # spectacle
   # xdg-desktop-portal-kde
-  
-  thunar
-  tumbler
-
-  hyprland
-  swww
-  # hyprpaper
-  waybar
-  dunst
-  wofi
-  wl-clipboard
-  grim
-  slurp
-  playerctl
-  pavucontrol
-  xdg-desktop-portal-hyprland
-  xdg-desktop-portal-gtk
-  gnome-keyring
-  polkit-gnome
-  
-  dart-sass
-  #cava
-  #btop
 )
 
-AUR_PACKAGES=(
+readonly AUR_PACKAGES=(
   paru-bin
-  # rtl8821au-dkms-git
   visual-studio-code-bin
 )
 
+validate_partition_type() {
+  local mount_point="$1"
+  local expected_guid="${2,,}"
+  local type_label="$3"
+  local device
+  local actual_guid
 
-ping -c 3 archlinux.org
+  device=$(findmnt -n -o SOURCE --target "$mount_point")
+  
+  if [[ -z "$device" ]]; then
+    echo "Error: Could not resolve block device for $mount_point"
+    exit 1
+  fi
 
-cat > arch.conf <<EOF
+  actual_guid=$(lsblk -no PARTTYPE "$device" | tr '[:upper:]' '[:lower:]')
+
+  if [[ "$actual_guid" != "$expected_guid" ]]; then
+    echo "Error: $device ($mount_point) does not match the expected type: $type_label"
+    echo "Expected: $expected_guid"
+    echo "Found:    ${actual_guid:-None}"
+    exit 1
+  fi
+}
+
+check_prerequisites() {
+  if [[ $EUID -ne 0 ]]; then
+    echo "Error: This script must be run as root."
+    exit 1
+  fi
+
+  if [[ ! -d /sys/firmware/efi/efivars ]]; then
+    echo "Error: System is not booted in UEFI mode."
+    exit 1
+  fi
+  echo "Checking Internet Connection".
+  if ! ping -c 1 archlinux.org &> /dev/null; then
+    echo "Error: No internet connection."
+    exit 1
+  fi
+
+  for target in "$MOUNT_DIR" "$MOUNT_DIR/boot" "$MOUNT_DIR/efi"; do
+    if ! mountpoint -q "$target"; then
+      echo "Error: $target is not mounted."
+      exit 1
+    fi
+  done
+
+  validate_partition_type "$MOUNT_DIR/efi" "$GUID_EFI" "EFI System"
+  validate_partition_type "$MOUNT_DIR" "$GUID_ROOT" "Linux root (x86-64)"
+  validate_partition_type "$MOUNT_DIR/boot" "$GUID_XBOOTLDR" "Linux extended boot"
+}
+
+configure_mirrors() {
+  reflector -c India --threads 50 --sort age --sort rate --sort score --sort delay \
+    --download-timeout 3 --connection-timeout 3 --save /etc/pacman.d/mirrorlist
+}
+
+install_base_system() {
+  pacman-key --init
+  pacman-key --populate archlinux
+  pacstrap -K "$MOUNT_DIR" "${BASE_PACKAGES[@]}"
+  genfstab -U "$MOUNT_DIR" >> "$MOUNT_DIR/etc/fstab"
+}
+
+configure_system_files() {
+  cp /etc/pacman.d/mirrorlist "$MOUNT_DIR/etc/pacman.d/mirrorlist"
+  
+  printf "%s\n" "${OTHER_PACKAGES[@]}" > "$MOUNT_DIR/root/pkglist"
+  printf "%s\n" "${AUR_PACKAGES[@]}" > "$MOUNT_DIR/root/pkglist.aur"
+
+  sed -i 's/#en_US.UTF-8/en_US.UTF-8/' "$MOUNT_DIR/etc/locale.gen"
+  echo "LANG=en_US.UTF-8" > "$MOUNT_DIR/etc/locale.conf"
+  echo "$TARGET_HOSTNAME" > "$MOUNT_DIR/etc/hostname"
+
+  cat > "$MOUNT_DIR/etc/hosts" <<EOF
+127.0.0.1    localhost
+::1          localhost
+EOF
+
+  sed -i 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' "$MOUNT_DIR/etc/sudoers"
+  sed -i 's/#Color/Color/' "$MOUNT_DIR/etc/pacman.conf"
+  # sed -z 's/#\[multilib\]\n#Include/\[multilib\]\nInclude/g' -i "$MOUNT_DIR/etc/pacman.conf"
+}
+
+configure_bootloader() {
+  local root_dev
+  local root_uuid
+  
+  root_dev=$(findmnt -n -o SOURCE --target "$MOUNT_DIR")
+  root_uuid=$(blkid -s UUID -o value "$root_dev")
+
+  if [[ -z "$root_dev" ]]; then
+    echo "Error: Could not determine root device."
+    exit 1
+  fi
+
+  mkdir -p "$MOUNT_DIR/boot/loader/entries/"
+  cat > "$MOUNT_DIR/boot/loader/entries/arch.conf" <<EOF
 title   Arch Linux
 linux   /vmlinuz-linux
+initrd  /amd-ucode.img
 initrd  /initramfs-linux.img
-initrd 	/amd-ucode.img
-options root=/dev/nvme0n1p6 rw
+options root=UUID=$root_uuid rw
 EOF
+}
 
-reflector -c India --threads 50 --sort age --sort rate --sort score --sort delay --download-timeout 3 --connection-timeout 3 --save /etc/pacman.d/mirrorlist
-
-MOUNT=/mnt
-HOSTNAME=arch
-
-pacman-key --init
-pacman-key --populate archlinux
-pacstrap -K $MOUNT ${BASE_PACKAGES[@]}
-genfstab -U $MOUNT >> $MOUNT/etc/fstab
-
-printf "%s\n" "${OTHER_PACKAGES[@]}" > $MOUNT/root/pkglist
-printf "%s\n" "${AUR_PACKAGES[@]}" > $MOUNT/root/pkglist.aur
-
-cp /etc/pacman.d/mirrorlist $MOUNT/etc/pacman.d/mirrorlist
-
-sed -i 's/#en_US.UTF-8/en_US.UTF-8/' $MOUNT/etc/locale.gen
-echo LANG=en_US.UTF-8 > $MOUNT/etc/locale.conf
-
-echo $HOSTNAME > $MOUNT/etc/hostname
-
-cat > $MOUNT/etc/hosts <<EOF
-# Static table lookup for hostnames.
-# See hosts(5) for details.
-#
-127.0.0.1	localhost
-::1		localhost
-EOF
-
-sed -i 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' $MOUNT/etc/sudoers
-
-sed -i 's/#Color/Color/' $MOUNT/etc/pacman.conf
-sed -z 's/#\[multilib\]\n#Include/\[multilib\]\nInclude/g' -i $MOUNT/etc/pacman.conf
-
-# mkdir -p $MOUNT/etc/NetworkManager/conf.d/
-# cat > $MOUNT/etc/NetworkManager/conf.d/wifi_backend.conf <<EOF
-# [device]
-# wifi.backend=iwd
-# EOF
-
-mkdir -p /etc/systemd/network/
-cat > $MOUNT/etc/systemd/network/10-wired.network <<EOF
+configure_networking() {
+  mkdir -p "$MOUNT_DIR/etc/systemd/network/"
+  
+  cat > "$MOUNT_DIR/etc/systemd/network/10-wired.network" <<EOF
 [Match]
-Name=enp37s0
+Name=en*
 
 [Link]
 RequiredForOnline=routable
@@ -217,9 +184,9 @@ RequiredForOnline=routable
 DHCP=yes
 EOF
 
-cat > $MOUNT/etc/systemd/network/20-wifi.network <<EOF
+  cat > "$MOUNT_DIR/etc/systemd/network/20-wifi.network" <<EOF
 [Match]
-Name=wlan0
+Name=wl*
 
 [Link]
 RequiredForOnline=routable
@@ -229,24 +196,41 @@ Policy=down
 DHCP=yes
 IgnoreCarrierLoss=3s
 EOF
+}
 
-cat > $MOUNT/etc/adjtime <<EOF
-0.0 0 0.0
-0
-LOCAL
-EOF
-
-arch-chroot $MOUNT /bin/bash - <<EOF
-ln -sf /usr/share/zoneinfo/Asia/Kolkata /etc/localtime
+execute_chroot_operations() {
+  arch-chroot "$MOUNT_DIR" /bin/bash - <<EOF
+ln -sf /usr/share/zoneinfo/$TARGET_TIMEZONE /etc/localtime
 hwclock --hctosys --localtime
-# timedatectl set-local-rtc 1
 locale-gen
-pacman -Syu --noconfirm
-pacman -S --needed - < /root/pkglist
 
+# Sync and install secondary packages
+pacman -Syu --noconfirm
+pacman -S --needed --noconfirm - < /root/pkglist
+
+# Setup user
 useradd -m -G wheel user
 echo "user:user" | chpasswd
 echo "root:root" | chpasswd
 
-# systemctl enable NetworkManager
+# Enable essential services
+systemctl enable systemd-networkd
+systemctl enable iwd
 EOF
+}
+
+
+
+main() {
+  check_prerequisites
+  configure_mirrors
+  install_base_system
+  configure_system_files
+  configure_bootloader
+  configure_networking
+  execute_chroot_operations
+  
+  echo "Base installation complete."
+}
+
+main "$@"

@@ -147,6 +147,13 @@ EOF
   sed -i 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' "$MOUNT_DIR/etc/sudoers"
   sed -i 's/#Color/Color/' "$MOUNT_DIR/etc/pacman.conf"
   # sed -z 's/#\[multilib\]\n#Include/\[multilib\]\nInclude/g' -i "$MOUNT_DIR/etc/pacman.conf"
+
+  cat > "$MOUNT_DIR/etc/resolv.conf" <<EOF
+# Resolver configuration file.
+# See resolv.conf(5) for details.
+nameserver 1.1.1.3
+nameserver 1.0.0.3
+EOF
 }
 
 configure_bootloader() {

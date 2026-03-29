@@ -122,6 +122,7 @@ configure_mirrors() {
 }
 
 install_base_system() {
+  pacman -Sy --needed --noconfirm archlinux-keyring
   pacman-key --init
   pacman-key --populate archlinux
   pacstrap -K "$MOUNT_DIR" "${BASE_PACKAGES[@]}"

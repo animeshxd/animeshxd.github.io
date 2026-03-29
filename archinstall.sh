@@ -35,7 +35,7 @@ readonly OTHER_PACKAGES=(
   libvirt virt-manager virt-viewer qemu-base docker docker-compose docker-buildx
   noto-fonts noto-fonts-cjk noto-fonts-emoji
   
-  thunar tumbler hyprland swww
+  thunar tumbler hyprland awww
   waybar dunst wofi wl-clipboard grim slurp playerctl pavucontrol
   xdg-desktop-portal-hyprland xdg-desktop-portal-gtk gnome-keyring
   polkit-gnome dart-sass

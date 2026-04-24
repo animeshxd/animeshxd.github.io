@@ -24,4 +24,6 @@ ln -s /mnt/etc/sv/sshd /mnt/var/service/
 
 #TODO: change password of root
 
+#### MIGRATE TO NIRI ####
+
 

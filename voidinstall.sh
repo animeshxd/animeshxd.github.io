@@ -1,4 +1,4 @@
-REPO=https://mirror.freedif.org/voidlinux/
+REPO=https://mirror.freedif.org/voidlinux/current
 ARCH=x86_64
 
 xbps-install -Su xbps
